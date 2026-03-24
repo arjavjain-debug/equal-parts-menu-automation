@@ -36,7 +36,7 @@ const MESSAGE_COLOR = rgb(0x8c / 255, 0x3e / 255, 0x2e / 255);
 const FONT_SIZE = 16;
 
 // Annotation rects — the designated text area [x1, y1, x2, y2] (bottom-left origin)
-const DINNER_RECT = { x1: 22.69, y1: 491.14, x2: 768.93, y2: 518.31 };
+const DINNER_RECT = { x1: 22.80, y1: 490.90, x2: 770.11, y2: 518.54 };
 const LATE_NIGHT_RECT = { x1: 110.74, y1: 486.14, x2: 768.93, y2: 513.31 };
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

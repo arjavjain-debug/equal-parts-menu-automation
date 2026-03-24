@@ -14,7 +14,7 @@ const FONT_PATH = path.join(ROOT, "fonts", "LibreBaskerville-Regular.ttf");
 const MESSAGE_COLOR = rgb(0x8c / 255, 0x3e / 255, 0x2e / 255);
 const FONT_SIZE = 16;
 
-const DINNER_RECT = { x1: 22.69, y1: 491.14, x2: 768.93, y2: 518.31 };
+const DINNER_RECT = { x1: 22.80, y1: 490.90, x2: 770.11, y2: 518.54 };
 const LATE_NIGHT_RECT = { x1: 110.74, y1: 486.14, x2: 768.93, y2: 513.31 };
 
 // ── PDF Generation ──────────────────────────────────────────────────────────
