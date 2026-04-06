@@ -29,6 +29,10 @@ const LATE_NIGHT_TEMPLATE = path.join(
   TEMPLATES_DIR,
   "Equal Parts SF Menu - Late Night PRINT MESSAGE.pdf"
 );
+const BRUNCH_TEMPLATE = path.join(
+  TEMPLATES_DIR,
+  "Equal Parts SF Menu - Brunch PRINT MESSAGE.pdf"
+);
 const FONT_PATH = path.join(FONTS_DIR, "LibreBaskerville-Regular.ttf");
 
 // Message styling — #8C3E2E brown, Libre Baskerville, 16pt, ALL CAPS
@@ -38,6 +42,7 @@ const FONT_SIZE = 16;
 // Annotation rects — the designated text area [x1, y1, x2, y2] (bottom-left origin)
 const DINNER_RECT = { x1: 22.80, y1: 490.90, x2: 770.11, y2: 518.54 };
 const LATE_NIGHT_RECT = { x1: 110.74, y1: 486.14, x2: 768.93, y2: 513.31 };
+const BRUNCH_RECT = { x1: 22.66, y1: 492.45, x2: 682.87, y2: 515.62 };
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -144,7 +149,7 @@ async function main() {
     process.exit(1);
   }
 
-  for (const t of [DINNER_TEMPLATE, LATE_NIGHT_TEMPLATE]) {
+  for (const t of [DINNER_TEMPLATE, LATE_NIGHT_TEMPLATE, BRUNCH_TEMPLATE]) {
     if (!fs.existsSync(t)) {
       console.error(`Template not found: ${t}`);
       console.error(
@@ -185,12 +190,25 @@ async function main() {
       continue;
     }
 
+    const templateLower = template?.toLowerCase() || "";
+    const isBrunch = templateLower.includes("brunch");
     const isLateNight =
-      template?.toLowerCase().includes("late") ||
-      template?.toLowerCase().includes("night");
-    const templatePath = isLateNight ? LATE_NIGHT_TEMPLATE : DINNER_TEMPLATE;
-    const rect = isLateNight ? LATE_NIGHT_RECT : DINNER_RECT;
-    const templateLabel = isLateNight ? "Late Night" : "Dinner";
+      templateLower.includes("late") || templateLower.includes("night");
+
+    let templatePath, rect, templateLabel;
+    if (isBrunch) {
+      templatePath = BRUNCH_TEMPLATE;
+      rect = BRUNCH_RECT;
+      templateLabel = "Brunch";
+    } else if (isLateNight) {
+      templatePath = LATE_NIGHT_TEMPLATE;
+      rect = LATE_NIGHT_RECT;
+      templateLabel = "Late Night";
+    } else {
+      templatePath = DINNER_TEMPLATE;
+      rect = DINNER_RECT;
+      templateLabel = "Dinner";
+    }
 
     // Generate single personalized menu
     const singleMenuBytes = await generateSingleMenu(templatePath, message, rect);

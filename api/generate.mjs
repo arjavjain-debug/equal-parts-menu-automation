@@ -9,6 +9,7 @@ import fontkit from "@pdf-lib/fontkit";
 const ROOT = process.cwd();
 const DINNER_TEMPLATE = path.join(ROOT, "templates", "Equal Parts SF Menu - Dinner PRINT MESSAGE.pdf");
 const LATE_NIGHT_TEMPLATE = path.join(ROOT, "templates", "Equal Parts SF Menu - Late Night PRINT MESSAGE.pdf");
+const BRUNCH_TEMPLATE = path.join(ROOT, "templates", "Equal Parts SF Menu - Brunch PRINT MESSAGE.pdf");
 const FONT_PATH = path.join(ROOT, "fonts", "LibreBaskerville-Regular.ttf");
 
 const MESSAGE_COLOR = rgb(0x8c / 255, 0x3e / 255, 0x2e / 255);
@@ -16,6 +17,7 @@ const FONT_SIZE = 16;
 
 const DINNER_RECT = { x1: 22.80, y1: 490.90, x2: 770.11, y2: 518.54 };
 const LATE_NIGHT_RECT = { x1: 110.74, y1: 486.14, x2: 768.93, y2: 513.31 };
+const BRUNCH_RECT = { x1: 22.66, y1: 492.45, x2: 682.87, y2: 515.62 };
 
 // ── PDF Generation ──────────────────────────────────────────────────────────
 
@@ -80,6 +82,7 @@ export default async function handler(req, res) {
     // Read templates and font once
     const dinnerBytes = fs.readFileSync(DINNER_TEMPLATE);
     const lateNightBytes = fs.readFileSync(LATE_NIGHT_TEMPLATE);
+    const brunchBytes = fs.readFileSync(BRUNCH_TEMPLATE);
     const fontBytes = fs.readFileSync(FONT_PATH);
 
     const lines = csv.split("\n");
@@ -103,12 +106,25 @@ export default async function handler(req, res) {
 
       if (!message) continue;
 
+      const templateLower = template?.toLowerCase() || "";
+      const isBrunch = templateLower.includes("brunch");
       const isLateNight =
-        template?.toLowerCase().includes("late") ||
-        template?.toLowerCase().includes("night");
-      const templateBytes = isLateNight ? lateNightBytes : dinnerBytes;
-      const rect = isLateNight ? LATE_NIGHT_RECT : DINNER_RECT;
-      const templateLabel = isLateNight ? "Late Night" : "Dinner";
+        templateLower.includes("late") || templateLower.includes("night");
+
+      let templateBytes, rect, templateLabel;
+      if (isBrunch) {
+        templateBytes = brunchBytes;
+        rect = BRUNCH_RECT;
+        templateLabel = "Brunch";
+      } else if (isLateNight) {
+        templateBytes = lateNightBytes;
+        rect = LATE_NIGHT_RECT;
+        templateLabel = "Late Night";
+      } else {
+        templateBytes = dinnerBytes;
+        rect = DINNER_RECT;
+        templateLabel = "Dinner";
+      }
 
       const singleMenuBytes = await generateSingleMenu(templateBytes, fontBytes, message, rect);
       const singleDoc = await PDFDocument.load(singleMenuBytes);
