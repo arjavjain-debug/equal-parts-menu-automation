@@ -164,8 +164,10 @@ async function main() {
   const raw = fs.readFileSync(csvPath, "utf-8");
   const lines = raw.split("\n");
 
-  // Row 1 is font instruction header, Row 2 is column names, Row 3+ is data
-  const dataLines = lines.slice(1).join("\n");
+  // Skip font instruction header row if present (first row won't contain column names)
+  const firstRow = lines[0]?.trim() || "";
+  const hasInstructionHeader = !firstRow.includes("Reservation");
+  const dataLines = hasInstructionHeader ? lines.slice(1).join("\n") : lines.join("\n");
   const records = parse(dataLines, {
     columns: true,
     skip_empty_lines: true,
@@ -181,7 +183,7 @@ async function main() {
   for (let i = 0; i < records.length; i++) {
     const row = records[i];
     const template = row["Menu Template"]?.trim();
-    const message = row["${{MESSAGE}"]?.trim() || row["${MESSAGE}"]?.trim();
+    const message = row["${{MESSAGE}"]?.trim() || row["${MESSAGE}"]?.trim() || row["[AUTOMATED] Custom Message"]?.trim();
     const name = row["Reservation Name"]?.trim() || `Reservation_${i + 1}`;
     const guestCount = parseInt(row["Guest Count (Print Qty)"]?.trim() || "1", 10);
 

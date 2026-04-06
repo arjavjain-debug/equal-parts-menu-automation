@@ -77,7 +77,9 @@ async function generateSingleMenu(templatePath, message, rect) {
 
 async function generateCombinedPdf(csvContent) {
   const lines = csvContent.split("\n");
-  const dataLines = lines.slice(1).join("\n");
+  const firstRow = lines[0]?.trim() || "";
+  const hasInstructionHeader = !firstRow.includes("Reservation");
+  const dataLines = hasInstructionHeader ? lines.slice(1).join("\n") : lines.join("\n");
   const records = parse(dataLines, {
     columns: true,
     skip_empty_lines: true,
@@ -91,7 +93,7 @@ async function generateCombinedPdf(csvContent) {
   for (let i = 0; i < records.length; i++) {
     const row = records[i];
     const template = row["Menu Template"]?.trim();
-    const message = row["${{MESSAGE}"]?.trim() || row["${MESSAGE}"]?.trim();
+    const message = row["${{MESSAGE}"]?.trim() || row["${MESSAGE}"]?.trim() || row["[AUTOMATED] Custom Message"]?.trim();
     const name = row["Reservation Name"]?.trim() || `Reservation ${i + 1}`;
     const guestCount = parseInt(row["Guest Count (Print Qty)"]?.trim() || "1", 10);
 
